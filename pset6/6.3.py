@@ -5,12 +5,14 @@ db = gu.FeatureDB("yeast.db")
 
 bamfile = pysam.AlignmentFile("set6readssort.bam", "rb")
 
+out = open("GenesFPKM.txt","w")
 
 Genecount = []
 Genelen = []
+GeneName = []
 mappedreads = 0.0
 for mRNA in db.features_of_type("mRNA"):
-	mappedreads +=1
+	GeneName.append(mRNA["Name"] [0])
 
 	mRNAlength = 0.0
 	ref = mRNA.chrom
@@ -23,6 +25,7 @@ for mRNA in db.features_of_type("mRNA"):
 		continue
 	
 	Genecount.append(genereads)
+	mappedreads += genereads
 	
 	for CDS in db.children(mRNA, featuretype = "CDS"):
 		CDSlength = CDS.stop - CDS.start +1
@@ -31,8 +34,5 @@ for mRNA in db.features_of_type("mRNA"):
 FPKM = []
 for i in range(len(Genelen)):
 	FPKM.append((Genecount[i]/(Genelen[i]*mappedreads))*10**9)
-
-for elem in FPKM:
-	print mRNA["Name"], elem
-
+	out.write("%s\t%f\n"%(GeneName[i],FPKM[i]))
 
